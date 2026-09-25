@@ -1,4 +1,4 @@
-﻿// Ui.cs —— 现代化界面（扁平风格、圆角卡片、大按钮、状态配色）
+// Ui.cs —— 现代化界面（扁平风格、圆角卡片、大按钮、状态配色）
 // 与 WuwaOutlineTool.cs 里的 Core 共用同一套逻辑与磁盘状态格式。
 
 using System;
@@ -407,25 +407,33 @@ namespace WuwaOutline
                 string t = null;
                 if (col == "StateText")
                 {
+                    // 按"格子里显示的那句话"来解释，别按底层 State：
+                    // State=patched 包含了好几种情况（已去描边 / 空顶点色 / 本就无描边），
+                    // 只按 State 分会让"无需处理"的行也弹出"已经去描边了"。
+                    string st = entry.StateText;
+                    bool noOutlineData = st.StartsWith(Lang.T("空顶点色")) || st.Contains(Lang.T("本就无描边"));
                     if (!entry.ColorUsed)
                     {
                         t = Lang.T("这个 mod 的 ini 里没有声明自己的 Color.buf（只声明了贴图，没有 ib= / vb0..vb4= 这类顶点缓冲绑定）。") +
                             Lang.T("\r\n说明它画的是**游戏原版网格**，所以它自己的顶点色根本不会被加载 —— 清 R/G 不会有任何效果，工具会跳过它。") +
                             Lang.T("\r\n游戏里看到的描边是原版模型的描边，要处理得靠 shader 级的去描边 mod。");
                     }
+                    else if (noOutlineData)
+                    {
+                        t = Lang.T("这份模型本来就没有描边数据（多半是武器 / 发饰 / 特效网格），工具会跳过它，不做任何改动。");
+                    }
+                    else if (st.StartsWith(Lang.T("已去描边")))
+                    {
+                        t = Lang.T("已经去描边了。原始数据保存在这个 mod 的「我的备份」里，随时可以还原。");
+                    }
                     else switch (entry.State)
                     {
-                        case "patched": t = Lang.T("已经去描边了。原始数据保存在这个 mod 的「我的备份」里，随时可以还原。"); break;
                         case "pristine": t = Lang.T("内容和已记录的原始档一致 —— 也就是说：目前是原版状态（已还原或从未改动）。"); break;
                         case "modified": t = Lang.T("这个文件被外部改动过（作者更新了 mod，或别的工具改过）。再点「开始去描边」会以现在的内容为新基准重打，并另存一份新的原始档。"); break;
-                        default:
-                            t = entry.StateText.StartsWith(Lang.T("空顶点色")) || entry.StateText.Contains(Lang.T("本就无描边"))
-                                ? Lang.T("这份模型本来就没有描边数据（多半是武器 / 发饰 / 特效网格），工具会跳过它，不做任何改动。")
-                                : Lang.T("还没处理过。点「开始去描边」会清掉描边，并自动在这个 mod 里留一份原始档。");
-                            break;
+                        default: t = Lang.T("还没处理过。点「开始去描边」会清掉描边，并自动在这个 mod 里留一份原始档。"); break;
                     }
-                    if (entry.StateText.Contains(Lang.T("无原始档"))) t += Lang.T("\r\n注意：找不到原始档，还原不了（可能是备份被删了）。");
-                    if (entry.StateText.Contains(Lang.T("有Fixer"))) t += Lang.T("\r\n这个 mod 里还有 Wuwa Mod Fixer 的备份，也能作为还原点使用。");
+                    if (st.Contains(Lang.T("无原始档"))) t += Lang.T("\r\n注意：找不到原始档，还原不了（可能是备份被删了）。");
+                    if (st.Contains(Lang.T("有Fixer"))) t += Lang.T("\r\n这个 mod 里还有 Wuwa Mod Fixer 的备份，也能作为还原点使用。");
                 }
                 else if (col == "GOnText") { t = Lang.T("原本带着描边数据的顶点数：") + (entry.GOn < 0 ? Lang.T("（大文件未统计，可勾选「大文件也精确统计顶点数」）") : entry.GOn.ToString()); }
                 else if (col == "Verts") { t = Lang.T("顶点数：") + entry.Verts + Lang.T("（约 ") + Core.FormatSize(new FileInfo(entry.BufPath).Length) + Lang.T("）"); }
