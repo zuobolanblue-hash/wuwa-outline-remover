@@ -1,0 +1,18 @@
+# 统一换行，避免 Windows 上检出后被 git 改成 LF 引发整文件 diff
+* text=auto eol=crlf
+
+*.ps1  text eol=crlf
+*.cs   text eol=crlf
+*.tsv  text eol=crlf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# 二进制：别做任何行尾转换
+*.exe binary
+*.ico binary
+*.png binary
+*.zip binary
+
+# 翻译表在 diff 里按文本看更清楚
+*.tsv diff

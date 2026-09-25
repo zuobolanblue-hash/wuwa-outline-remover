@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 常见问题（先看这里）
+    url: https://github.com/zuobolanblue-hash/wuwa-outline-remover#常见问题
+    about: 「改完没效果」「头发还有一圈」「会不会封号」「会不会改错文件」等高频问题都写在 README 里
+  - name: 安全问题（请走私密通道，勿公开披露）
+    url: https://github.com/zuobolanblue-hash/wuwa-outline-remover/security/advisories/new
+    about: 涉及数据安全、文件误删一类的问题请走私密报告

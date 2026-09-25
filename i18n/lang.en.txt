@@ -1,0 +1,232 @@
+      WARNING: patched but no original archive found - only Alpha can be adjusted in place, restoring later will be impossible
+      also cleaned this tool's archive: freed {0} KB
+      identical original archive already exists, skipping archive -> {0}
+      original archived -> {0}
+   ...and 
+    orphan: 
+  "note": "R=0,G=0；B 保留；A 按 alpha 设置"
+  [note] 
+  [ISSUE] 
+  ·  vertex-color method (R=outline mask  G=outline thickness  B=skin mask untouched  A=hair thickness)
+  processed 
+ restore point(s) - the one marked "<= current base" is the pre-patch content
+ Color.buf file(s), reading state...
+ orphan(s) (-PurgeOrphans to clean):
+)
+ more; use "Clean orphan backups" to remove them all
+ archive(s)
+ archive(s) + manifest(s)
+: no Color.buf found here (and no [ResourceColorBuffer] either)
+ check(s)
+\r\nThat means it draws the game's own mesh, so its vertex colors are never loaded - zeroing R/G has no effect at all, and the tool skips it.
+\r\nThe outline you see in game is the vanilla mesh's outline; removing it needs a shader-level mod.
+\r\nThis mod also has Wuwa Mod Fixer backups, which can be used as restore points.
+\r\nNote: no original archive found, cannot restore (the backup may have been deleted).
+(not counted for large files; tick "Count vertices exactly for large files")
+ (dry run)
+ (dry run, nothing written)
+(approx. 
+[dry run] {0} (vertices {1}; base {2}; Alpha={3})
+[dry run] would delete 
+[dry run] would restore {1} from {0}
+] restore point(s): 
+] has no restore points: its original data was never archived.
+] has no restore points: this mod was never archived by this tool (vanilla mod, or its archive was deleted).
+{0} {1} orphan archive(s), {2}
+[DRY RUN] 
+<= current base
+A=255 (alternative, rarely needed)
+Alpha=0 applied to the A channel
+B/A preserved byte-for-byte
+Fixer backup
+the mod's ini does not declare Color.buf, so the vertex-color method does nothing for it (its vanilla outline stays)
+the mod's ini does not declare Color.buf, so changes have no effect (restore it so you don't think it worked)
+Mods folder
+Mod name as shown in the mod manager
+R/G all zero (no outline anyway)
+R/G zeroed
+Number of .BAK files Wuwa Mod Fixer left in this mod (read-only; this tool never modifies them)
+Restore the row selected in the table to the version selected in the list
+Restore every file in range to how it was before this tool touched it (newest archive)
+Version
+Leave as is (recommended)
+Backup / Restore
+Backup / Restore: view versions, restore, verify, clean up
+Backups live inside each mod's own Meshes folder: .nooutline.json (manifest) + Color.buf.orig.<hash>.bak (original file), so renaming or moving the mod keeps them
+This tool's archive
+Backup space this tool occupies in the mod. "Delete my backups & manifest" frees it (after which you can no longer restore)
+no outline anyway
+Table: one row per Color.buf of a mod.\r\nHover the "State" cell for a plain-language explanation.\r\nDouble-click a row to jump to its restore points.
+Show restore points of the selected mod
+ERROR: 
+initial state = Original (not recorded) (actual 
+state after patch = Outline removed (actual 
+Count vertices exactly for large files (slow)
+Size
+Outlined
+Outlined verts
+current file (= recorded original)
+current file (no archive; Alpha only)
+current file (new original)
+Vertices
+Vertices: 
+read failed: 
+Remove the outline on every file in range.\r\nAlready-processed files are skipped automatically (no duplicate archives, no stacking).\r\nAn original archive is saved inside each mod folder first.
+Found 
+Found 1 Color.buf (actual 
+B still preserved after changing Alpha
+Remove the cel-shading outline from skin mods  ·  originals archived automatically, restorable anytime  ·  press F10 in game to reload
+restore after update = new content
+re-patch after update: B/A follow the new version (the old archive no longer overwrites it)
+{0} total  ·  {1} issues  ·  {2} notes  ·  {3:0.0}s
+{0} Color.buf total; {1} orphan archive(s).
+When ticked, only the rows selected in the table are processed; nothing else is touched.\r\nGood for trying one or two characters first.
+orphan archive(s) 
+Not processed yet. "Remove outline" clears it and archives the original inside this mod automatically.
+No scan results yet\r\n\r\nClick "Scan" at the top right to list every skin mod, then "Remove outline".
+Restore to a specific version: {0} - using {1} ({2}) {3}
+restore point (
+Restore points travel with the mod folder: still recognised after renaming or moving.
+Restore points: one row per original file you can go back to.\r\n· mine:xxxx = this tool's archive; legacy = old script backup; fixer:... = Wuwa Mod Fixer .BAK\r\n· the row marked "current base" is this tool's pre-patch state\r\nSelect a row, then "Selected row -> restore to selected version" overwrites the file with it.
+manifest removed after restore
+byte-identical to the original after restore
+restore failed: no restore point "
+Restoring...
+Legacy backup
+Restoring: {0} file(s), selector={1}{2}
+Remove outline
+Removing outline: {0} file(s), Alpha={1}{2}
+Scanning: 
+Where restorable originals come from: mine = this tool's archive, legacy = old backup, fixer = Wuwa Mod Fixer .BAK
+Empty vertex color
+Empty vertex color (nothing to do)
+Source
+List every restorable version of the mod selected in the table
+Browse...
+green = outline removed; grey = untouched original; orange = needs attention (changed externally / no outline data anyway / mod does not use vertex color)
+Could not read the selected version, please select it again.
+No orphan archives.
+No orphan archives: everything this tool created matches a Color.buf.
+No rows selected.
+WuWa Outline Remover
+WuWa Outline Remover  ·  
+WuWa Outline Remover v
+By default only small files get an exact "outlined vertices" count; large files show "-" (for speed).\r\nTick this when you need exact numbers - scanning gets slower.
+Folder does not exist.
+Folder does not exist: 
+content changed externally (will re-patch using the new content as base)
+Unknown content (archive present)
+Content matches the recorded original - i.e. it is currently in its original state (restored, or never modified).
+recognises orphan archives/manifests (
+Skin
+Skin / mod
+manifest present, archive missing
+Clear
+Clear the log panel below (the WuwaOutlineTool.log file on disk is untouched)
+Remove leftovers (backups and manifests) whose mod has been deleted or replaced. Wuwa Mod Fixer .BAK files are never touched.
+Cleaning orphan archives...
+no orphans after cleaning
+Clean orphan backups (mod deleted)
+Cleaning...
+Please scan first.
+Select the mod you want to restore first.
+Select a mod on the "Remove outline" tab first (or double-click a row).
+Select a mod on the "Remove outline" tab first (or double-click it to jump here).
+Also remove hair outline (A=0)
+Outline removal
+Outline removal: scan, inspect state, apply
+Removing outline...
+All → restore to pre-patch
+All → restore to earliest version
+Scan
+scan failed: 
+Scan summary: total / issues / notes / elapsed
+Scan complete: {0} Color.buf, {1} issues, {2} notes, took {3:0.0}s.
+Scanning...
+delete failed: 
+Delete my backups & manifest
+Delete the backups and manifest this tool left in the mod, freeing space.\r\nNote: after this you can no longer restore. Wuwa Mod Fixer .BAK files are never touched.
+body is clean but the hair still has a rim → pick the 2nd option and run again
+content-hash archive created
+manifest created
+Time
+refresh failed: 
+Note
+notes
+Verify (read-only)
+verify failed: 
+Verify complete: {0} Color.buf - clean {1}; notes {2}; issues {3}
+Verify complete: {0} Color.buf - clean {1}; notes {2}; issues {3}; orphan archives {4}
+Verifying...
+skip -> {0} (the mod's ini does not declare Color.buf; it draws the game's own mesh, so the vertex-color method does nothing for it)
+skipped: mod does not use vertex color, no effect
+Hair outline
+How to handle the hair outline:\r\n· Leave as is (default): only R/G are cleared, the A channel is untouched\r\n· Remove hair outline (A=0): use this when the body is clean but the hair still has a rim\r\n· A=255: another value, try it if neither of the above looks right
+Go back to the earliest backup. Note: this may be older than a Wuwa Mod Fixer repair - generally avoid it unless you really want that older state.
+Done: {0} file(s) changed this run.
+Done: {0} changed, {1} skipped. Press F10 in game to reload WWMI.
+Vertex color unused (no effect)
+File
+My backup
+none
+Cannot restore (no such restore point "{0}"): {1}
+nothing to clean
+no outline data and no source record (if this is a character body the record is lost, so it cannot be restored)
+nothing to do (no outline anyway)
+nothing to do (empty vertex color)
+no archive
+Select a mod above (or double-click it) and every restorable version is listed here
+Choose the Mods folder to process
+Choose the Mods folder to process (a single group, or the whole Mods tree)
+Selected row → restore to selected version
+Dry run: 
+Dry run: would restore to 
+Dry run: would clean 
+Dry run: would remove outline (Alpha=
+Dry run: show results only, change nothing
+Dry-run mode: prints only what would happen into the log below and writes nothing.\r\nTick it to preview which mods would change.
+Dry run...
+Folder to process. Point it at one group (e.g. _MANAGED_\\group_6) to process only that group,\r\nor at the whole Mods tree to process everything (all groups, including disabled mods).\r\nThe tool walks every level of subfolders looking for each mod's Meshes\\Color.buf.
+Restored
+Restored -> {0} (restore point {1})
+restored (
+This mod's restore points are listed - pick a version in the list below, then click this button again.
+Outline already removed. The original data is kept in this mod's "My backup" and can be restored at any time.
+Cleaned
+Cleaned 
+Cleaned this tool's archive: {0} file(s), freed {1} KB (Fixer .BAK untouched)
+Outline removed
+Outline removed -> {0} (vertices {1}; base {2}; Alpha={3})
+Outline removed (Alpha=
+Outline removed (no archive)
+Deleted 
+Already up to date, skipped
+0 issues: every record matches and the restore chain is complete.
+See --help for usage
+Fixer
+archive present, manifest missing (half state, still restorable)
+Interoperates with Wuwa Mod Fixer .BAK backups (read-only). Press F10 in game to reload WWMI after changes.
+Original (not recorded)
+Original (has Fixer backup)
+Original, unmodified
+Vertices that originally carried outline data: 
+How many vertices originally carried outline data. 0 = no outline to begin with, nothing to do
+How it works: outline thickness lives in the mesh's own vertex colors (R=outline mask, G=outline thickness).\r\nThis tool only zeroes those two channels - it does not care which character it is and does not rely on shader hashes, so new characters and game updates need no changes.\r\nOnly affects characters that have a skin mod; pure vanilla characters need a shader-level mod.
+Archive
+original archive lost, cannot restore
+Run log. Also written to WuwaOutlineTool.log next to this tool
+In 
+This mesh has no outline data to begin with (usually a weapon / accessory / effect mesh), so the tool skips it and changes nothing.
+Hair setting used when this file was patched; - means it has never been processed
+This mod's ini does not declare its own Color.buf (it only declares textures, with no ib= / vb0..vb4= vertex-buffer bindings).
+How many vertices this mesh has (Color.buf bytes ÷ 4)
+This file was changed externally (the mod author updated it, or another tool touched it). Clicking "Remove outline" again re-patches using the current content as the new base and stores a new original archive.
+Only process rows selected in the table
+Read-only check: are records complete, is any archive missing, are there orphan backups. Changes nothing.
+Read-only; changes nothing.\r\nLists every skin mod's current state, vertex count and backup status.
+re-running is idempotent (skipped)
+restore points survive a rename (state follows the folder)
+still found after rename
+Note: restore points belong to a single mod, so only the first selected row is restored. To restore a whole group use "All → restore to pre-patch".
+State
+after author update state = Unknown content (archive present) (actual 

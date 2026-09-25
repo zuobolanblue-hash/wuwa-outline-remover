@@ -1,0 +1,31 @@
+root = true
+
+[*]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# 源码：UTF-8 带 BOM
+# （编译用的是 /codepage:65001，带不带 BOM 都能编，但带 BOM 在中文 Windows 上
+#   用记事本 / 老编辑器打开不会变乱码）
+[*.cs]
+charset = utf-8-bom
+
+# PowerShell：**必须**带 BOM
+# Windows PowerShell 5.1 会把无 BOM 的 UTF-8 当 GBK 读，带中文的脚本会直接语法报错。
+# 万一 BOM 丢了，跑一次 build.ps1 会自动补回来。
+[*.ps1]
+charset = utf-8-bom
+
+[*.{md,yml,yaml}]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+[*.{tsv,txt}]
+charset = utf-8
+
+[*.json]
+indent_size = 2
+charset = utf-8

@@ -1,0 +1,44 @@
+# 注意：GitHub 要求推送 .github/workflows/ 的令牌带 workflow scope，
+# 当前仓库的令牌没有该 scope，所以这份 CI 配置先放在 docs/ci/ 里存档。
+# 启用方式（二选一）：
+#   ① 命令行：gh auth refresh -h github.com -s workflow
+#             git mv docs/ci/build.yml .github/workflows/build.yml && git commit -m "ci: 启用 GitHub Actions"
+#   ② 网页：仓库 → Add file → Create new file → 路径填 .github/workflows/build.yml，把本文件内容粘进去name: build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 编译（Windows 自带 csc，无需 SDK / 无需联网）
+        shell: pwsh
+        run: .\build.ps1 -KeepRunning
+
+      - name: 自检（中 / 英）
+        shell: pwsh
+        run: |
+          .\WuwaOutlineTool.exe --selftest
+          if ($LASTEXITCODE -ne 0) { throw "selftest (zh) failed" }
+          .\WuwaOutlineTool.exe --selftest -Lang en
+          if ($LASTEXITCODE -ne 0) { throw "selftest (en) failed" }
+
+      - name: 离线验证阶梯（第 0 级只读 + 第 1 级沙盒逐字节，没游戏目录就用合成样本）
+        shell: pwsh
+        run: .\tools\wuwa-test.ps1
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: WuwaOutlineTool-${{ github.sha }}
+          path: WuwaOutlineTool.exe
+          if-no-files-found: error
