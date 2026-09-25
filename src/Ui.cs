@@ -210,6 +210,11 @@ namespace WuwaOutline
         private Label lblStatusDot, lblStatus, lblCount, lblVer;
 
         private readonly List<Entry> _entries = new List<Entry>();
+        private TextBox txtSearch;
+        private Label lblSearch;
+        private CardPanel searchBox;
+        private string _filter = "";
+        private int _sortState;                       // 0=不排序 1=按状态升序 2=降序
         private Entry _pointsEntry;   // 回滚页当前列的是哪个 mod 的还原点
         private TabPill pillZh, pillEn;   // 中 / EN 切换
         private int _tab;                 // 当前页签，重建界面时用来还原
@@ -390,7 +395,7 @@ namespace WuwaOutline
 
             grid.Columns.Add(Col("Mod", Lang.T("皮肤 / mod"), 220, true, Lang.T("mod 文件夹名，就是 mod manager 里显示的那个名字")));
             grid.Columns.Add(Col("Verts", Lang.T("顶点数"), 84, false, Lang.T("这个模型有多少个顶点（Color.buf 字节数 ÷ 4）")));
-            grid.Columns.Add(Col("StateText", Lang.T("状态"), 205, false, Lang.T("绿=已去描边；灰=原版未处理；橙=需注意（内容被改过 / 本来就没有描边数据 / mod 没使用顶点色）")));
+            grid.Columns.Add(Col("StateText", Lang.T("状态"), 205, false, Lang.T("绿=已去描边；灰=原版未处理；橙=需注意（内容被改过 / 本来就没有描边数据 / mod 没使用顶点色）") + Environment.NewLine + Lang.T("点「状态」表头可以按状态排序（再点一次反向）")));
             grid.Columns.Add(Col("GOnText", Lang.T("带描边顶点"), 100, false, Lang.T("原本有多少个顶点带着描边数据。0 = 本来就没有描边，无需处理")));
             grid.Columns.Add(Col("ManAlpha", "Alpha", 78, false, Lang.T("这份文件打补丁时用的头发处理参数；- 表示还没处理过")));
             grid.Columns.Add(Col("OrigLabel", Lang.T("原始档"), 150, false, Lang.T("可还原回去的原始文件来源：mine = 本工具存档，legacy = 旧版备份，fixer = Wuwa Mod Fixer 的 .BAK")));
@@ -444,9 +449,8 @@ namespace WuwaOutline
             {
                 if (ev.RowIndex < 0 || ev.ColumnIndex < 0) return;
                 if (grid.Columns[ev.ColumnIndex].DataPropertyName != "StateText") return;
-                var e = ev.RowIndex < _entries.Count ? _entries[ev.RowIndex] : null;
-                Entry entry = null;
-                if (grid.Rows[ev.RowIndex].Tag is Entry) entry = (Entry)grid.Rows[ev.RowIndex].Tag; else entry = e;
+                // 只认行上的 Tag（有搜索筛选时，行号不再等于 _entries 的下标）
+                var entry = grid.Rows[ev.RowIndex].Tag as Entry;
                 if (entry == null) return;
                 Color c = Theme.Text;
                 string st = entry.StateText;
@@ -463,6 +467,21 @@ namespace WuwaOutline
                 if (ev.RowIndex >= 0) { SwitchTab(1); ShowHistory(); }
             };
 
+            // 搜索框：按 mod / 角色名筛选表格
+            lblSearch = new Label { Text = Lang.T("搜索"), Font = Theme.Small, ForeColor = Theme.SubText, AutoSize = true, BackColor = Color.Transparent };
+            searchBox = new CardPanel { Radius = 8 };
+            txtSearch = new TextBox { BorderStyle = BorderStyle.None, Font = Theme.Body, BackColor = Theme.Card, ForeColor = Theme.Text };
+            SetCue(txtSearch, Lang.T("输入角色 / mod 名筛选"));
+            txtSearch.TextChanged += delegate { _filter = txtSearch.Text.Trim(); BindEntries(); };
+            searchBox.Controls.Add(txtSearch);
+
+            // 点「状态」表头按状态排序（再点一次反向）
+            grid.ColumnHeaderMouseClick += delegate(object s, DataGridViewCellMouseEventArgs ev)
+            {
+                if (ev.ColumnIndex < 0) return;
+                if (grid.Columns[ev.ColumnIndex].DataPropertyName == "StateText") SortByState();
+            };
+
             emptyHint = new Label
             {
                 Text = Lang.T("还没有扫描结果\r\n\r\n点右上角「扫描」列出所有皮肤 mod，然后点「开始去描边」"),
@@ -473,6 +492,8 @@ namespace WuwaOutline
             };
 
             gridCard.Controls.Add(grid);
+            gridCard.Controls.Add(lblSearch);
+            gridCard.Controls.Add(searchBox);
             gridCard.Controls.Add(emptyHint);
             pageApply.Controls.Add(gridCard);
 
@@ -609,6 +630,8 @@ namespace WuwaOutline
             tip.SetToolTip(chkSelectedOnly, Lang.T("勾上后，只对表格里选中的那些行操作，其它文件一律不碰。\r\n适合先拿一两个角色试水。"));
             tip.SetToolTip(chkDryRun, Lang.T("演练模式：只把「会做什么」打印到下面的日志里，不写任何文件。\r\n想先看清楚会改哪些 mod 就勾这个。"));
             tip.SetToolTip(chkDeep, Lang.T("默认只统计小文件的「带描边顶点数」，大文件那一列显示 -（为了快）。\r\n需要精确数字时勾上，代价是扫描慢一些。"));
+            tip.SetToolTip(txtSearch, Lang.T("按 mod / 角色名筛选表格，只显示包含这段文字的 mod（不区分大小写）。清空就恢复全部。"));
+            tip.SetToolTip(lblSearch, Lang.T("按 mod / 角色名筛选表格，只显示包含这段文字的 mod（不区分大小写）。清空就恢复全部。"));
 
             tip.SetToolTip(grid, Lang.T("表格：每一行是一个 mod 的 Color.buf。\r\n悬浮在「状态」格上会用人话解释这一行的现状。\r\n双击某一行可直接跳到「备份 / 回滚」页看它的还原点。"));
             tip.SetToolTip(emptyHint, "");
@@ -708,7 +731,12 @@ namespace WuwaOutline
             pageApply.Bounds = new Rectangle(0, 0, contentHost.Width, contentHost.Height);
             pageRollback.Bounds = pageApply.Bounds;
             gridCard.Bounds = new Rectangle(0, 0, pageApply.Width, pageApply.Height);
-            grid.Bounds = new Rectangle(Theme.S(12), Theme.S(12), Math.Max(Theme.S(80), gridCard.Width - Theme.S(24)), Math.Max(Theme.S(60), gridCard.Height - Theme.S(24)));
+            // 表格卡片顶部放搜索框，表格往下让出位置
+            lblSearch.Location = new Point(Theme.S(20), Theme.S(22));
+            searchBox.Bounds = new Rectangle(lblSearch.Right + Theme.S(8), Theme.S(12), Theme.S(300), Theme.S(32));
+            txtSearch.Bounds = new Rectangle(Theme.S(11), (Theme.S(32) - Theme.S(20)) / 2, Math.Max(Theme.S(40), searchBox.Width - Theme.S(22)), Theme.S(20));
+            int searchH = Theme.S(54);
+            grid.Bounds = new Rectangle(Theme.S(12), searchH, Math.Max(Theme.S(80), gridCard.Width - Theme.S(24)), Math.Max(Theme.S(60), gridCard.Height - searchH - Theme.S(12)));
             emptyHint.Bounds = grid.Bounds;
 
             int by = Theme.S(6), bh = Theme.S(38);
@@ -811,6 +839,7 @@ namespace WuwaOutline
         private void RebuildUi()
         {
             string root = txtRoot.Text.Trim();
+            string filter = txtSearch.Text;
             string log = txtLog.Text;
             int alphaIdx = cboAlpha.SelectedIndex;
             bool deep = chkDeep.Checked;
@@ -825,6 +854,7 @@ namespace WuwaOutline
             ResumeLayout(true);
 
             SetRoot(root);
+            txtSearch.Text = filter;      // 触发 TextChanged，筛选条件跟着恢复
             if (alphaIdx >= 0) cboAlpha.SelectedIndex = alphaIdx;
             chkDeep.Checked = deep;
             foreach (var e in _entries) Core.SetStateText(e);   // 状态列文案跟着换语言
@@ -1055,14 +1085,63 @@ namespace WuwaOutline
             });
         }
 
+        // 当前该显示哪些行（受搜索框筛选）
+        private List<Entry> VisibleEntries()
+        {
+            if (_filter.Length == 0) return _entries;
+            var list = new List<Entry>();
+            foreach (var e in _entries)
+                if (e.ModName != null && e.ModName.IndexOf(_filter, StringComparison.OrdinalIgnoreCase) >= 0) list.Add(e);
+            return list;
+        }
+
+        // 状态排序权重：越需要注意的越靠前（按底层状态算，与界面语言无关）
+        private static int StateRank(Entry e)
+        {
+            if (!e.ColorUsed) return 10;                 // 未使用顶点色（改了无效）
+            if (e.State == "modified") return 20;        // 内容不认识（有原始档）
+            if (e.State == "untracked") return 30;       // 原版（未记录）
+            if (e.State == "pristine") return 35;        // 原版未改
+            if (e.State == "patched")
+            {
+                if (e.Orig == null && e.AllZero) return 50;                           // 空顶点色（无需处理）
+                if (e.Orig == null && !e.HasManifest && e.MineCount == 0) return 45;  // R/G 全零（本就无描边）
+                return 40;                                                            // 已去描边
+            }
+            return 35;
+        }
+
+        private void SortByState()
+        {
+            _sortState = _sortState == 1 ? 2 : 1;
+            _entries.Sort(delegate(Entry a, Entry b)
+            {
+                int r = StateRank(a).CompareTo(StateRank(b));
+                if (r == 0) r = string.Compare(a.ModName, b.ModName, StringComparison.OrdinalIgnoreCase);
+                return _sortState == 1 ? r : -r;
+            });
+            BindEntries();
+        }
+
         private void BindEntries()
         {
+            var vis = VisibleEntries();
             var src = new BindingSource();
-            src.DataSource = _entries.Select(MakeRow).ToList();
+            src.DataSource = vis.Select(MakeRow).ToList();
             grid.DataSource = src;
-            for (int i = 0; i < _entries.Count && i < grid.Rows.Count; i++) grid.Rows[i].Tag = _entries[i];
-            emptyHint.Visible = _entries.Count == 0;
-            grid.Visible = _entries.Count > 0;
+            for (int i = 0; i < vis.Count && i < grid.Rows.Count; i++) grid.Rows[i].Tag = vis[i];
+
+            // 表头带箭头，说明当前在按状态排序
+            foreach (DataGridViewColumn c in grid.Columns)
+                if (c.DataPropertyName == "StateText")
+                    c.HeaderText = Lang.T("状态") + (_sortState == 0 ? "" : (_sortState == 1 ? " ▲" : " ▼"));
+
+            bool none = vis.Count == 0;
+            emptyHint.Text = (none && _filter.Length > 0 && _entries.Count > 0)
+                ? string.Format(Lang.T("没有匹配「{0}」的 mod"), _filter) + Environment.NewLine + Environment.NewLine + Lang.T("换个关键词，或清空搜索框看全部")
+                : Lang.T("还没有扫描结果\r\n\r\n点右上角「扫描」列出所有皮肤 mod，然后点「开始去描边」");
+            emptyHint.Visible = none;
+            grid.Visible = !none;
         }
 
         private static object MakeRow(Entry e)

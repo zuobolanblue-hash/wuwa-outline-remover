@@ -244,6 +244,12 @@ namespace WuwaOutline
             "点『浏览…』选你的 Mods 目录	Click Browse... to pick your Mods folder",
             "还没选 MOD 目录：点上面的『浏览…』选一下（一般是 XXMI 目录下的 Mods 文件夹）	No Mods folder selected yet - click Browse... above (usually the Mods folder inside your XXMI install)",
             "界面语言已切换为：	Language switched to: ",
+            "搜索	Search",
+            "输入角色 / mod 名筛选	Filter by character / mod name",
+            "没有匹配「{0}」的 mod	No mod matches \"{0}\"",
+            "换个关键词，或清空搜索框看全部	Try another keyword, or clear the search box to see everything",
+            "按 mod / 角色名筛选表格，只显示包含这段文字的 mod（不区分大小写）。清空就恢复全部。	Filter the table by mod / character name (case-insensitive). Clear it to show everything again.",
+            "点「状态」表头可以按状态排序（再点一次反向）	Click the \"State\" header to sort by state (click again to reverse)",
         };
     }
 }
