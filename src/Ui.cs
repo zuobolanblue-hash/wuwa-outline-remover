@@ -621,6 +621,14 @@ namespace WuwaOutline
         }
 
         // ── 排版 ──────────────────────────────────────────────
+        // 按文字实际宽度定宽（中文宽度当下限）：英文文案更长，写死宽度会被画成 "..."
+        private static void FitText(Control c)
+        {
+            if (c == null || string.IsNullOrEmpty(c.Text)) return;
+            int need = TextRenderer.MeasureText(c.Text, c.Font).Width + Theme.S(40);
+            if (need > c.Width) c.Width = need;
+        }
+
         private void DoLayout()
         {
             if (headerCard == null || ClientSize.Width < Theme.S(200)) return;
@@ -696,6 +704,9 @@ namespace WuwaOutline
             emptyHint.Bounds = grid.Bounds;
 
             int by = Theme.S(6), bh = Theme.S(38);
+            // 英文文案比中文长，写死宽度会被截成 "..."，所以先按文字实际宽度定宽（中文宽度当下限）
+            FitText(btnHistory); FitText(btnRestoreSel); FitText(btnRestoreLatest); FitText(btnRestoreEarliest);
+            FitText(btnVerify); FitText(btnClean); FitText(btnPurge);
             btnHistory.Location = new Point(0, by);
             btnRestoreSel.Location = new Point(btnHistory.Right + Theme.S(8), by);
             btnRestoreLatest.Location = new Point(btnRestoreSel.Right + Theme.S(8), by);
